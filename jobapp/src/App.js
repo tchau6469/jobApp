@@ -49,12 +49,17 @@ function AddedJob({pic, companyName, jobTitle, rating, url}) {
 }
 
 function JobCard() {
+   const [loading, setLoading] = useState({});
+
+   window.loading = () => {
+    setLoading({});
+   }
    
-   const arr = [];
+   const existingJobs = [];
    for (let key in jobs) {
       let value = jobs[key];
       
-      arr.push(<AddedJob pic={monkey} 
+      existingJobs.push(<AddedJob pic={monkey} 
                          companyName={value.companyName}
                          jobTitle={value.jobTitle}
                          rating={value.rating}
@@ -67,13 +72,13 @@ function JobCard() {
     <>
       
       <AddJobCard />
-      {arr}
+      {existingJobs}
     </>  
   );
 }
 
 export default function App() {
-
+  
   return (
     <div>
       <JobCard />      
@@ -109,11 +114,13 @@ function JobForm({showForm, setShowForm}) {
                   url: urlRef.current.value
     }
     const key = info.companyName + info.jobTitle;
-    const jobs = JSON.parse(localStorage.getItem("jobs"));
-    jobs[key] = info;
+    const newJobs = JSON.parse(localStorage.getItem("jobs"));
+    newJobs[key] = info;
     
-    localStorage.setItem("jobs", JSON.stringify(jobs));
-    
+    localStorage.setItem("jobs", JSON.stringify(newJobs));
+    jobs = newJobs;
+
+    window.loading();
     setShowForm(!showForm);
 
   }
