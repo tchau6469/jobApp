@@ -1,6 +1,5 @@
 
 import './App.css';
-import monkey from "./pics/monkey.png";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {fas} from '@fortawesome/free-solid-svg-icons';
@@ -8,7 +7,7 @@ import {  useRef, useState } from 'react';
 
 library.add(fas);
 
-let jobs = {};
+let initialJobs = {};
 
 if (typeof window !== 'undefined') {
   
@@ -18,70 +17,98 @@ if (typeof window !== 'undefined') {
     localStorage.setItem("jobs", JSON.stringify({}));
   }
   else {
-    jobs = data;
+    initialJobs = data;
   }
   
 }
 
-function LogoLink({pic}) {
+function LogoLink({url}) {
   return(
     <div >
-      <a href="https://www.youtube.com/watch?v=UmqupMGGAcM">
-        <img src={pic} alt="monkey getting haircut"/>
+      <a href={url}>
+        
+        {url}
       </a>
     </div>
   );
 }
 
 
-function AddedJob({pic, companyName, jobTitle, rating, url}) {
+function AddedJob({companyName, jobTitle, rating, url, currJobs, setCurrJobs}) {
+
+  const buttonHandler = () => {
+    const key = companyName + jobTitle;
+    const jobs = JSON.parse(localStorage.getItem("jobs"));
+
+    delete jobs[key];
+
+    localStorage.setItem("jobs", JSON.stringify(jobs));
+
+    setCurrJobs(jobs);
+    
+  }
+
   return (
     <div className="container">
       
-        <LogoLink pic={pic}/>
+        <LogoLink url={url}/>
         <h2>{companyName}</h2>
         <h2>{jobTitle}</h2>
         <h2>{rating}</h2>
-        <h2>{url}</h2>
+        
+
+        <button onClick={buttonHandler}>
+          DELETE
+        </button>
       
     </div>
   ); 
 }
 
-function JobCard() {
-   const [loading, setLoading] = useState({});
-
-   window.loading = () => {
-    setLoading({});
-   }
+function JobCard({currJobs, setCurrJobs}) {
    
+
    const existingJobs = [];
-   for (let key in jobs) {
-      let value = jobs[key];
+   for (let key in currJobs) {
+      let value = currJobs[key];
       
-      existingJobs.push(<AddedJob pic={monkey} 
+      existingJobs.push(<AddedJob 
                          companyName={value.companyName}
                          jobTitle={value.jobTitle}
                          rating={value.rating}
                          url={value.url}
                          key={value.companyName + value.jobTitle}
+                         setCurrJobs={setCurrJobs}
+                         currJobs={currJobs}
               />)
    }
   
    return (
     <>
       
-      <AddJobCard />
+      <AddJobCard currJobs={currJobs} setCurrJobs={setCurrJobs}/>
       {existingJobs}
     </>  
   );
 }
 
 export default function App() {
-  
+  const [currJobs, setCurrJobs] = useState(initialJobs);
+
   return (
     <div>
-      <JobCard />      
+      <div>
+        <h2>{Object.keys(currJobs).length > 1 ? `${Object.keys(currJobs).length} jobs` : `${Object.keys(currJobs).length} job` }</h2>
+        <button onClick={()=> {
+          localStorage.clear(); 
+          localStorage.setItem("jobs", JSON.stringify({})); 
+          setCurrJobs({})
+        }}
+        >CLEAR JOBS
+        </button>
+      </div> 
+      <JobCard currJobs={currJobs} setCurrJobs={setCurrJobs}/>
+           
     </div>
   );
 }
@@ -101,12 +128,13 @@ function AddNewJob({showForm, setShowForm}) {
   );
 }
 
-function JobForm({showForm, setShowForm}) {
+function JobForm({showForm, setShowForm, currJobs, setCurrJobs}) {
   const companyNameRef = useRef(null);
   const jobTitleRef = useRef(null);
   const ratingRef = useRef(null);
   const urlRef= useRef(null);
 
+  
   function handleAddButton() {
     const info = {companyName: companyNameRef.current.value, 
                   jobTitle: jobTitleRef.current.value, 
@@ -115,14 +143,14 @@ function JobForm({showForm, setShowForm}) {
     }
     const key = info.companyName + info.jobTitle;
     const newJobs = JSON.parse(localStorage.getItem("jobs"));
-    newJobs[key] = info;
     
+    newJobs[key] = info;
     localStorage.setItem("jobs", JSON.stringify(newJobs));
-    jobs = newJobs;
+    
 
-    window.loading();
     setShowForm(!showForm);
-
+    setCurrJobs(newJobs);
+      
   }
 
   return (
@@ -130,37 +158,40 @@ function JobForm({showForm, setShowForm}) {
       <button style={{display: "block"}}onClick={() => setShowForm(!showForm)} >Go Back</button>
       
       
-        <label htmlFor="companyName">
-          Company Name
-          <input ref={companyNameRef} 
-                 type="text" 
-                 autoFocus/>
-        </label>
-        <label htmlFor="jobTitle">
-          Job Title
-          <input ref={jobTitleRef}  
-                 type="text" />
-        </label>
-        <label htmlFor="rating">
-          Rating
-          <input ref={ratingRef}
-                 type="text"/>
-        </label>
-        <label htmlFor="url">
-          URL
-          <input ref={urlRef}
-                 type="text"/>
-        </label>
-
-        <button onClick={handleAddButton}>Add</button>
+      <label htmlFor="companyName">
+        Company Name
+        <input ref={companyNameRef} 
+                type="text" 
+                required={true}
+                autoFocus/>
+      </label>
+      <label htmlFor="jobTitle">
+        Job Title
+        <input ref={jobTitleRef}
+                type="text" />
+      </label>
+      <label htmlFor="rating">
+        Rating
+        <input ref={ratingRef}
+                type="text"/>
+      </label>
+      <label htmlFor="url">
+        URL
+        <input ref={urlRef}
+                type="text"/>
+      </label>
+      <button onClick={handleAddButton}>Submit</button>
         
-
       
+
+        
+        
+        
     </div>
   );
 }
 
-function AddJobCard() {
+function AddJobCard({currJobs, setCurrJobs}) {
   const [showForm, setShowForm] = useState(false);
 
   return (
@@ -168,6 +199,8 @@ function AddJobCard() {
       {showForm ? <JobForm 
                     showForm={showForm} 
                     setShowForm={setShowForm}
+                    currJobs={currJobs}
+                    setCurrJobs={setCurrJobs}
                   /> 
                 : <AddNewJob 
                     showForm={showForm} 
