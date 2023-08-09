@@ -32,7 +32,7 @@ label {
   margin-top: 0.5rem;
 }
 
-input {
+.formInputs {
   display: block;
   margin: 0 auto;
   width: 80%;

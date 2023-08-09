@@ -65,7 +65,7 @@ function AddedJob({companyName, jobTitle, rating, url, currJobs, setCurrJobs}) {
   ); 
 }
 
-function JobCard({currJobs, setCurrJobs}) {
+function JobCard({currJobs, setCurrJobs, shouldFilter, setShouldFilter}) {
    
 
    const existingJobs = [];
@@ -82,6 +82,13 @@ function JobCard({currJobs, setCurrJobs}) {
                          currJobs={currJobs}
               />)
    }
+   
+   if (shouldFilter) {
+    existingJobs.sort((a,b)=> {
+      
+      return b.props.rating - a.props.rating;
+    });
+   }
   
    return (
     <>
@@ -92,13 +99,31 @@ function JobCard({currJobs, setCurrJobs}) {
   );
 }
 
+function FilterBox({shouldFilter, setShouldFilter}) {
+  return (
+    <div>
+      <label htmlFor="filter">Filter by rating?
+        <input onChange={(e) => setShouldFilter(e.target.checked)} 
+                checked={shouldFilter} 
+                id="filter" 
+                name="filter" 
+                type="checkbox"
+                style={{}}/>
+      </label>
+    </div> 
+  );
+}
+
 export default function App() {
   const [currJobs, setCurrJobs] = useState(initialJobs);
+  const [shouldFilter, setShouldFilter] = useState(false);
 
+  
   return (
     <div>
       <div>
         <h2>{Object.keys(currJobs).length > 1 ? `${Object.keys(currJobs).length} jobs` : `${Object.keys(currJobs).length} job` }</h2>
+        <FilterBox shouldFilter={shouldFilter} setShouldFilter={setShouldFilter}/>
         <button onClick={()=> {
           localStorage.clear(); 
           localStorage.setItem("jobs", JSON.stringify({})); 
@@ -107,7 +132,7 @@ export default function App() {
         >CLEAR JOBS
         </button>
       </div> 
-      <JobCard currJobs={currJobs} setCurrJobs={setCurrJobs}/>
+      <JobCard currJobs={currJobs} setCurrJobs={setCurrJobs} shouldFilter={shouldFilter} setShouldFilter={setShouldFilter}/>
            
     </div>
   );
@@ -161,24 +186,28 @@ function JobForm({showForm, setShowForm, currJobs, setCurrJobs}) {
       <label htmlFor="companyName">
         Company Name
         <input ref={companyNameRef} 
-                type="text" 
-                required={true}
-                autoFocus/>
+               type="text" 
+               required={true}
+               autoFocus
+               className="formInputs"/>
       </label>
       <label htmlFor="jobTitle">
         Job Title
         <input ref={jobTitleRef}
-                type="text" />
+               type="text" 
+               className="formInputs"/>
       </label>
       <label htmlFor="rating">
         Rating
         <input ref={ratingRef}
-                type="text"/>
+               type="text"
+               className="formInputs"/>
       </label>
       <label htmlFor="url">
         URL
         <input ref={urlRef}
-                type="text"/>
+               type="text"
+               className="formInputs"/>
       </label>
       <button onClick={handleAddButton}>Submit</button>
         
