@@ -1,10 +1,15 @@
 .container {
-  border: 5px solid;
+  border: ridge #47526E;
+  border-radius: 55px;
   width: 15%;
-  height: 40vh;
+  height: 50vh;
   text-align: center;
   margin: 1rem 2rem;  
   float: left;
+  background: linear-gradient(to bottom, #93a2c1,#3d538e);
+  border-width: thin;
+  position: relative;
+  
 }
 
 img {
@@ -39,9 +44,27 @@ label {
   font-size: 1.1rem;
 }
 
+.logoLink {
+  padding-top: 3rem
+}
+
 #submitButton {
   margin-top: 1rem;
   height: 4rem;
   width: 60%;
 }
 
+body {
+  background-color: #22324c;
+  
+}
+
+.optionsMenu {
+  width: 8%;
+  background-color: white;
+  padding-bottom: 1rem;
+}
+
+h2{
+  margin: 0.5rem 0;
+}
