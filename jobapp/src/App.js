@@ -49,6 +49,22 @@ function AddedJob({companyName, jobTitle, rating, url, date, currJobs, setCurrJo
     
   }
 
+  const confirmDelete = () => {
+    confirmAlert({
+      title: 'Delete this job? ',
+      message: 'Are you sure to do this?',
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: () => deleteJobHandler()
+        },
+        {
+          label: 'No',
+        }
+      ]
+    });
+  }
+
   
   console.log("CURR DATE: " + typeof(date) + date);
   
@@ -63,7 +79,7 @@ function AddedJob({companyName, jobTitle, rating, url, date, currJobs, setCurrJo
         <h2>Date Applied: <br />{date.slice(4,15)}<br /></h2>
         
 
-        <button style={{position: "absolute", bottom: "10px", marginLeft: "-2rem" }}onClick={deleteJobHandler}>
+        <button style={{position: "absolute", bottom: "10px", marginLeft: "-2rem" }}onClick={confirmDelete}>
           DELETE
         </button>
       
